@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Tix · West End · May 17</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1F3864;--teal:#1F7A8C;--orange:#C55A11;
+  --brown:#5C3317;--cream:#F5F0E8;--xlt:#EDE6D6;
+  --lt:#DDDDDD;--mid:#666;--dk:#222;--gold:#BF8F00;
+}
+body{font-family:'Inconsolata',monospace;background:var(--cream);color:var(--dk);font-size:16px;line-height:1.5;padding-bottom:60px}
+
+/* HEADER */
+.header{background:var(--navy);padding:16px 18px 12px;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--orange)}
+.header-label{font-size:11px;font-weight:900;letter-spacing:3px;color:rgba(255,255,255,.4);text-transform:uppercase}
+.header-trip{font-size:16px;font-weight:900;color:#fff;margin-top:2px}
+.header-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+
+/* SECTION LABELS */
+.section{padding:20px 18px 16px;border-bottom:1px solid var(--lt)}
+.section-label{font-size:10px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--mid);margin-bottom:10px}
+.section h2{font-size:18px;font-weight:900;color:var(--navy);margin-bottom:8px}
+.section p{font-size:13px;color:var(--mid);line-height:1.55;margin-bottom:8px}
+.section p:last-child{margin-bottom:0}
+
+/* WEATHER GRID */
+.wx-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.wx-cell{background:#fff;padding:10px 12px;border-radius:2px;border:1px solid var(--lt)}
+.wx-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
+.wx-val{font-size:14px;font-weight:700;color:var(--navy)}
+.wx-sub{font-size:11px;color:#aaa;margin-top:1px}
+.wx-cell.alert{background:#fff8f0;border-color:#e8c0a0}
+.wx-cell.alert .wx-val{color:var(--orange)}
+
+/* TIDE STRIP */
+.tide-strip{display:flex;gap:0;margin-top:8px;border-radius:2px;overflow:hidden;border:1px solid var(--lt)}
+.tide-seg{flex:1;padding:10px 8px;text-align:center;background:#fff}
+.tide-seg+.tide-seg{border-left:1px solid var(--lt)}
+.tide-seg .ts-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
+.tide-seg .ts-val{font-size:13px;font-weight:900;color:var(--navy)}
+.tide-seg .ts-sub{font-size:10px;color:#aaa;margin-top:1px}
+.tide-seg.active{background:var(--navy)}
+.tide-seg.active .ts-lbl{color:rgba(255,255,255,.5)}
+.tide-seg.active .ts-val{color:#fff}
+.tide-seg.active .ts-sub{color:rgba(255,255,255,.4)}
+
+/* SUMMARY CALLOUT */
+.callout{background:var(--navy);color:#fff;padding:14px 16px;margin-top:8px;border-radius:2px}
+.callout p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:6px}
+.callout p:last-child{margin-bottom:0}
+.callout strong{color:#fff}
+
+/* HISTORICAL */
+.hist-row{background:#fff;border:1px solid var(--lt);padding:10px 12px;margin-bottom:6px;border-radius:2px}
+.hist-lbl{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
+.hist-val{font-size:13px;color:var(--dk);line-height:1.4}
+.hist-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;margin-left:6px;vertical-align:middle}
+.hb-peak{background:#1a3a1a;color:#6aaa6a}
+.hb-open{background:#1a2a3a;color:#6a9aCA}
+
+/* PHASE PILLS */
+.pill{display:block;padding:10px 13px;margin-bottom:6px;font-size:13px;line-height:1.4;color:#fff;border-radius:2px}
+.pill .lbl{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:3px;opacity:.55}
+.p1{background:var(--navy)}.p2{background:var(--teal)}.p3{background:var(--brown)}
+
+/* PHASE HEADER */
+.phase{padding:18px 18px 13px;color:#fff}
+.ph1{background:var(--navy)}.ph2{background:var(--teal)}.ph3{background:var(--brown)}
+.phase-eye{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;opacity:.5;margin-bottom:4px}
+.phase-name{font-size:20px;font-weight:900;line-height:1.2;margin-bottom:5px}
+.phase-time{font-size:13px;opacity:.65}
+.ho{display:inline-block;background:var(--orange);color:#fff;font-size:10px;font-weight:900;letter-spacing:1px;padding:2px 8px;margin-left:6px;border-radius:2px;opacity:1}
+
+/* STOP CARD */
+.stop{padding:18px 18px 16px;border-bottom:1px solid var(--lt);background:#fff}
+.meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;color:#fff;border-radius:2px}
+.bn{background:var(--navy)}.bt{background:var(--teal)}.bb{background:var(--brown)}
+.pass{font-size:12px;color:var(--mid)}
+.time{font-size:13px;font-weight:700;color:var(--navy);margin-left:auto}
+.name{font-size:19px;font-weight:900;color:var(--navy);line-height:1.2;margin-bottom:6px}
+
+/* COORDS ROW — bigger */
+.coords-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.coords{font-size:15px;font-weight:700;color:var(--dk);letter-spacing:.5px}
+.ver{color:#3a7a3a}
+.nav-link{display:inline-flex;align-items:center;gap:5px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:2px;text-decoration:none;letter-spacing:.5px}
+.nav-link:active{opacity:.8}
+
+/* STOP DETAILS */
+.stop-details{font-size:13px;color:var(--mid);margin-bottom:12px;line-height:1.45;border-left:2px solid var(--lt);padding-left:10px}
+
+/* BULLETS */
+ul.b{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+ul.b li{padding-left:16px;position:relative;font-size:14px;color:#333;line-height:1.45}
+ul.b li::before{content:"·";position:absolute;left:0;color:var(--lt);font-size:20px;line-height:1.1;font-weight:900}
+ul.b li strong{color:var(--navy)}
+ul.b li.w{color:#8a2020}
+ul.b li.w::before{color:#c09090}
+ul.b li.m{color:#aaa;font-style:italic;font-size:13px}
+ul.b li.m::before{color:#ddd}
+
+/* MORE INFO LINK */
+.more-link{display:block;text-align:center;padding:8px 14px;background:var(--xlt);border:1px solid var(--lt);color:var(--mid);font-size:12px;font-weight:700;text-decoration:none;letter-spacing:1px;text-transform:uppercase;border-radius:2px;margin-top:4px}
+.more-link:active{background:var(--lt)}
+
+/* NEXT / PHASE BREAK */
+.nxt{text-align:center;padding:13px 0;font-size:11px;font-weight:700;letter-spacing:4px;color:var(--lt);text-transform:uppercase;background:var(--xlt)}
+.phase-break{text-align:center;padding:14px 0;font-size:11px;font-weight:900;letter-spacing:5px;text-transform:uppercase;background:var(--xlt)}
+.pb2{color:var(--teal);border-top:2px solid var(--teal);border-bottom:2px solid var(--teal)}
+.pb3{color:var(--brown);border-top:2px solid var(--brown);border-bottom:2px solid var(--brown)}
+
+.tnote{background:var(--xlt);border-left:3px solid var(--lt);padding:13px 18px;font-size:13px;color:var(--mid)}
+.tnote strong{color:var(--dk)}
+
+.ret{padding:22px 18px;background:var(--navy);color:#fff}
+.ret h2{font-size:18px;font-weight:900;margin-bottom:5px}
+.ret p{font-size:13px;opacity:.5}
+
+/* DEPTH/APPROACH TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tag{font-size:11px;padding:2px 8px;border-radius:2px;font-weight:600}
+.tag-depth{background:#e8f0e8;color:#3a5a3a}
+.tag-method{background:#e8eef8;color:var(--navy)}
+.tag-dist{background:#f0ebe0;color:#5a4a30}
+
+.sec-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--navy);
+  margin-bottom: 5px;
+  padding-left: 8px;
+  border-left: 3px solid var(--navy);
+}
+.stop-section { margin-bottom: 11px; }
+.sec-divider { border:none; border-top:1px solid var(--lt); margin:10px 0; }
+
+/* ── VIDEO DROPDOWN ── */
+.vid-section { margin-top: 12px; border-top: 1px solid var(--lt); padding-top: 10px; }
+details.vid-drop summary {
+  font-size: 12px; font-weight: 900; color: var(--navy);
+  letter-spacing: 1px; text-transform: uppercase;
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+  -webkit-appearance: none;
+}
+details.vid-drop summary::-webkit-details-marker { display: none; }
+details.vid-drop summary::before {
+  content: "▶";
+  font-size: 10px; color: var(--orange);
+  transition: transform 0.2s;
+}
+details.vid-drop[open] summary::before { content: "▼"; }
+.vid-select {
+  width: 100%; font-family: 'Inconsolata', monospace;
+  font-size: 12px; padding: 7px 10px;
+  border: 1px solid var(--lt); border-radius: 2px;
+  background: var(--xlt); color: var(--navy);
+  margin-bottom: 8px; margin-top: 6px;
+  -webkit-appearance: none; appearance: none;
+}
+.vid-frame {
+  position: relative; width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0; overflow: hidden;
+  border-radius: 2px;
+}
+.vid-frame iframe {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+
+.nav-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--navy); color: #fff;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px; font-weight: 700;
+  padding: 5px 12px; border-radius: 2px;
+  text-decoration: none; letter-spacing: .5px;
+}
+.nav-link:active { opacity: .8; }
+
+</style>
+
+
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Salty Cape · Trip Tix</div>
+  <div class="header-trip">West End of the Canal · BB.WE</div>
+  <div class="header-sub">May 17 2026 · Onset 6:30 AM · Return 2:45 PM</div>
+</div>
+
+<!-- WEATHER -->
+<div class="section">
+  <div class="section-label">Today's Forecast · NOAA NWS ANZ232 · Station 8447241</div>
+  <div class="wx-grid">
+    <div class="wx-cell alert">
+      <div class="wx-lbl">Sky / Vis</div>
+      <div class="wx-val">Fog at launch</div>
+      <div class="wx-sub">Clearing 8–9 AM per NOAA · your call</div>
+    </div>
+    <div class="wx-cell">
+      <div class="wx-lbl">Wind</div>
+      <div class="wx-val">SW 6–17 mph</div>
+      <div class="wx-sub">Building to 12–17 mph by 9 AM</div>
+    </div>
+    <div class="wx-cell">
+      <div class="wx-lbl">Seas</div>
+      <div class="wx-val">1–2 ft</div>
+      <div class="wx-sub">All session · comfortable</div>
+    </div>
+    <div class="wx-cell">
+      <div class="wx-lbl">Water / Air</div>
+      <div class="wx-val">54–58°F</div>
+      <div class="wx-sub">67°F air · good clarity</div>
+    </div>
+  </div>
+  <div class="tide-strip">
+    <div class="tide-seg">
+      <div class="ts-lbl">Low Tide</div>
+      <div class="ts-val">6:09 AM</div>
+      <div class="ts-sub">−1.609 ft</div>
+    </div>
+    <div class="tide-seg active">
+      <div class="ts-lbl">Peak OT</div>
+      <div class="ts-val">~9:15 AM</div>
+      <div class="ts-sub">90 min prime window</div>
+    </div>
+    <div class="tide-seg">
+      <div class="ts-lbl">Slack</div>
+      <div class="ts-val">~11–12 PM</div>
+      <div class="ts-sub">GFB activates</div>
+    </div>
+    <div class="tide-seg">
+      <div class="ts-lbl">High Tide</div>
+      <div class="ts-val">12:21 PM</div>
+      <div class="ts-sub">10.583 ft</div>
+    </div>
+  </div>
+
+  
+  <a href="https://captmike2026.github.io/triptix-test/West_End_Canal_SaltyCape.gpx"
+    style="display:block;margin-top:12px;padding:13px 16px;background:#1F3864;color:#fff;
+    font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;border-radius:2px;text-decoration:none;">
+    ↓ Download All Waypoints · Open in Navionics
+  </a>
+  <div style="font-size:11px;color:var(--mid);margin-top:5px;font-family:'Inconsolata',monospace;">
+    Tap → file downloads → tap the file → <strong>Open in Navionics</strong>
+  </div>
+
+<!-- HISTORICAL ANALYSIS -->
+<div class="section">
+  <div class="section-label">Historical Analysis · Mid-May West End</div>
+  <div class="hist-row">
+    <div class="hist-lbl">Striped Bass <span class="hist-badge hb-peak">Peak Window</span></div>
+    <div class="hist-val">First migratory wave staging at the Canal mouth on pogies and silversides. Keeper and trophy fish mixed. 3-week window — we're in it now.</div>
+  </div>
+  <div class="hist-row">
+    <div class="hist-lbl">Black Sea Bass <span class="hist-badge hb-open">Season Opener</span></div>
+    <div class="hist-val">Stacked on Hog Island wrecks, first weeks of pressure, aggressive on the jig. Best catch rate window of the year before pressure builds.</div>
+  </div>
+  <div class="hist-row">
+    <div class="hist-lbl">Tautog <span class="hist-badge hb-peak">Spring Peak</span></div>
+    <div class="hist-val">Resident boulder fish, Mashnee complex. May is the spring window on crab. Incoming tide washes green crab off the rocky bottom — that's the trigger.</div>
+  </div>
+  <div class="hist-row">
+    <div class="hist-lbl">Bait Picture</div>
+    <div class="hist-val">Pogies dominant on outgoing. Sand eels on structure. Green crab on rocky bottom. Water 54–58°F, good clarity post-frontal.</div>
+  </div>
+</div>
+
+<!-- TRIP SUMMARY -->
+<div class="section">
+  <div class="section-label">How We're Using the Tide Today</div>
+  <div class="callout">
+    <p><strong>SW wind + outgoing tide is the ideal pairing at Mass Maritime.</strong> The wind aligns with the Canal outflow and pushes bait into the seam. Bird plays form earlier. That's Phase 1.</p>
+    <p><strong>Slack arrives at 11 AM, perfectly timed for the GFB window.</strong> Sea bass on the Hog Island wrecks go dead-drop mode when current drops. Don't be running between spots during slack. That's Phase 2.</p>
+    <p><strong>Incoming builds at 12:21 PM and loads the Mashnee boulder complex.</strong> Green crab starts washing off the rocks. Tog come alive on early IT. That's Phase 3.</p>
+  </div>
+</div>
+
+<!-- THREE PHASES INTRO -->
+<div class="section">
+  <div class="section-label">The Plan</div>
+  <h2>Three Phases. One Tide Cycle.</h2>
+  <p>Work every stop in a phase before calling it dead. No optimistic signs after all passes — move on. If the fish are there, you'll find them.</p>
+  <div class="pill p1"><span class="lbl">Phase 1 · Striper</span>Birds working, surface activity, bass on sonar upper column, pogies visible</div>
+  <div class="pill p2"><span class="lbl">Phase 2 · Sea Bass</span>Arches on sonar near bottom, any hits or follows, scup active on the shoal</div>
+  <div class="pill p3"><span class="lbl">Phase 3 · Tog</span>Any contact on the boulder face, weight on jig, crab washing off rocks</div>
+</div>
+
+<!-- ═══ PHASE 1 ═══ -->
+<div class="phase ph1">
+  <div class="phase-eye">Phase 1</div>
+  <div class="phase-name">West End Striper Program</div>
+  <div class="phase-time">7:00–10:15 AM <span class="ho">Hard Out 10:15</span></div>
+</div>
+
+<!-- A1 -->
+<div class="stop">
+  <div class="meta"><span class="badge bn">A1</span><span class="pass">Pass 1 of 4</span><span class="time">7:00–7:20 AM</span></div>
+  <div class="name">Mass Maritime Point<br>Canal Outflow Seam</div>
+  <div class="coords-row">
+    <span class="coords">41.7369, −70.6300 <span class="ver">✓</span></span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Casting · B.WE.B.C1 (B2100)</span>
+    <span class="tag tag-dist">0 nm · launch position</span>
+  </div>
+  <div class="stop-details">Canal outflow seam on peak outgoing. SW wind loads the bait compression. 8:30–10:00 AM is the 90-minute prime window. Be positioned before it fires.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Canal outflow seam on peak outgoing. SW wind aligns with the current and loads bait into the seam. Bird plays form early. 8:30–10:00 AM is the 90-minute prime window — be positioned before it fires.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Approach downwind so engine noise carries away. Cut engine 60–80 yd out. Position 100 yd uptide of the seam. Cast uptide and let the lure swing naturally into the current edge.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Epoxy Jig 1 oz Olive</strong> — terns, sand eels, silverside bite</li><li><strong>XL Dog Walker 8.25" Bone / Amber</strong> — gulls, pogies visible</li><li><strong>Surface Eraser 4" Amber</strong> — long-range reach when birds spread</li><li><strong>Protail Paddle 5.5" Olive Bunker</strong> — bass sounded, mid-column</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy 7MH Inshore Spinning — big profile (Dog Walker, Protail)</li><li>Hogy 7M Inshore Spinning — smaller bait (Epoxy, Surface Eraser)</li><li>4000 reel · 20–30 lb braid · 20 lb fluoro 4–6 ft</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body"><strong>Terns</strong> = Epoxy, R2703 fast burn, twitch-pause on refusals. <strong>Gulls</strong> = Dog Walker, walk-the-dog with pauses at the current edge — strikes on the pause, not the burn. <strong>Bass sounded</strong> = Protail mid-column, slow crank-and-sweep 10–20 ft down.</div>
+  </div>
+  <div class="move-trigger">→  20 min no contact · no birds working → next stop</div>
+  
+  <div class="vid-section">
+    <details class="vid-drop">
+      <summary>Watch Capt. Mike Fish This Approach</summary>
+      <select class="vid-select" onchange="changeVideo(this)">
+        <option value="ydKfTtGiIQg">Topwater Striped Bass at the West End of the Canal</option>
+<option value="ywe_v34I_nc">Early-Season Topwater Stripers & Open Water Feeds</option>
+      </select>
+      <div class="vid-frame">
+        <iframe src="https://www.youtube.com/embed/ydKfTtGiIQg?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </details>
+  </div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/approaches/bb-we-b-c1" target="_blank">More Info → BB.WE.B.C1 Chasing Spring Birds</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- A2 -->
+<div class="stop">
+  <div class="meta"><span class="badge bn">A2</span><span class="pass">Pass 2 of 4</span><span class="time">7:25–7:45 AM</span></div>
+  <div class="name">Mashnee Island Point<br>& Reef Edge</div>
+  <div class="coords-row">
+    <span class="coords">41.7185, −70.6406 <span class="ver">✓</span></span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Casting · B.WE.B.C2 (B1400)</span>
+    <span class="tag tag-dist">0.3 nm SW · 2 min</span>
+  </div>
+  <div class="stop-details">Point rip on the outgoing. Stem the tide, fish the swing. Bigger average size than the open water program. Approach carefully.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Point rip on the outgoing. Current swings around the boulder face and creates a soft seam on the downcurrent edge. Bigger average size than the open water program. Structure-oriented fish.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Approach from downcurrent. Start well uptide and outside, swing wide around the point. Fan cast at 30° uptide — lures swing naturally across the boil.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>XL Dog Walker 7" Bone / Amber</strong> — primary</li><li><strong>Hogy Original 10" Amber</strong> — dawn/dusk, squid match</li><li><strong>Protail Paddle 6.5" 3 oz Olive Bunker</strong> — mid-column under turbulence</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy 7MH Inshore Spinning</li><li>4000 reel · 20–30 lb braid · 20 lb fluoro 4–6 ft</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Hits come on the swing into the boulder turbulence, not on the straight retrieve. When resetting, run far out and let the fish cool before easing back uptide.</div>
+  </div>
+  <div class="move-trigger">→  Still quiet at 9:30 AM → next stop</div>
+  
+  <div class="vid-section">
+    <details class="vid-drop">
+      <summary>Watch Capt. Mike Fish This Approach</summary>
+      <select class="vid-select" onchange="changeVideo(this)">
+        <option value="kFZgG_mT-dQ">Striped Bass Fishing with BIG Topwater Lures | West End</option>
+<option value="UhEWkWL4zz0">Salty Tips: Healthy Catch and Release Big Striped Bass</option>
+      </select>
+      <div class="vid-frame">
+        <iframe src="https://www.youtube.com/embed/kFZgG_mT-dQ?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </details>
+  </div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/approaches/bb-we-b-c2" target="_blank">More Info → BB.WE.B.C2 Mashnee Point Swing</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- A3 -->
+<div class="stop">
+  <div class="meta"><span class="badge bn">A3</span><span class="pass">Pass 3 of 4</span><span class="time">7:50–8:20 AM</span></div>
+  <div class="name">Hog Island Channel Contour</div>
+  <div class="coords-row">
+    <span class="coords">41.7167, −70.6283</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Trolling · B.WE.B.T (B2600)</span>
+    <span class="tag tag-dist">0.4 nm NW · 3 min</span>
+    <span class="tag tag-depth">30–65 ft contour</span>
+  </div>
+  <div class="stop-details">Channel troll on the outgoing. Troll WITH current, never against. Covers the 30–65 ft contour edge where bass hold on structure during the outgoing push.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Channel edge on the outgoing. Bass track the 30–65 ft contour edge where current deflects off the channel wall and creates a soft seam. Troll covers ground that casting can't reach.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Troll WITH current, never against. 2.2–2.5 kt. Bow quartered into the flow. Diagonal passes along the channel edges on the 30–65 ft contour.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Perfect Tube 19" Black</strong> — dawn and overcast conditions</li><li><strong>Perfect Tube 19" Wine</strong> — bright clear conditions</li><li><strong>OG Swim Plug 7" Olive</strong> — heavy current or bright sun</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy 5'6" Hybrid Trolling Rod</li><li>Conv. reel · 50–65 lb braid or leadcore</li><li>3.5–4.5 oz inline weight · 3–4 ft ahead of lure</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body"><strong>Drop-and-lift:</strong> when marks appear near bottom, shift out of gear for 15 sec, let the tube settle, ease back in slowly — this flips followers into strikes. <strong>Missed hit:</strong> surge the throttle to mimic fleeing bait.</div>
+  </div>
+  <div class="move-trigger">→  Still quiet → next stop</div>
+  
+  <div class="vid-section">
+    <details class="vid-drop">
+      <summary>Watch Capt. Mike Fish This Approach</summary>
+      <select class="vid-select" onchange="changeVideo(this)">
+        <option value="ScYuvRO9sig">Early Season Striped Bass | Hogy Protail THUMPER Swimba...</option>
+<option value="Y31hcPKSMPA">Spring Stripers | Hogy Slow Tails | Cast + Drop</option>
+      </select>
+      <div class="vid-frame">
+        <iframe src="https://www.youtube.com/embed/ScYuvRO9sig?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </details>
+  </div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/approaches/bb-we-b-t" target="_blank">More Info → BB.WE.B.T Running the Channel</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- A4 -->
+<div class="stop">
+  <div class="meta"><span class="badge bn">A4</span><span class="pass">Pass 4 of 4</span><span class="time">8:30–10:00 AM</span></div>
+  <div class="name">Open Water Scan<br>Full West End Corridor</div>
+  <div class="coords-row">
+    <span class="coords">41.7300, −70.6350 Est.</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Open Water · B500</span>
+    <span class="tag tag-dist">Run the corridor</span>
+  </div>
+  <div class="stop-details">Planned stop, not a reactive chase. Run the full corridor: Mass Maritime → Mashnee Flats → Cleveland Ledge direction. Migrating bass in May are moving the whole system.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Migrating bass in May are moving through the entire system, not tied to structure. Could be anywhere from Mass Maritime to Cleveland Ledge. Follow the birds — they mark the bait.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Run the full corridor: Mass Maritime → Mashnee Flats toward Cleveland Ledge. Read birds at 500 yd before you're in range. Cut engine 60–80 yd out. Never run through a pack.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Epoxy Jig 1 oz Olive</strong> — terns over sand eels</li><li><strong>XL Dog Walker 8.25" Bone</strong> — gulls over pogies</li><li><strong>Protail Paddle 5.5" Olive Bunker</strong> — under the gull pack</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy 7MH or 7M depending on bait type</li><li>20 lb fluoro · 4–6 ft</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body"><strong>Terns</strong> = Epoxy, fast burn. <strong>Gulls</strong> = Protail under the pack. Position outside the feed, approach downwind, never drive through the school.</div>
+  </div>
+  <div class="move-trigger">→  Corridor empty after one pass → Phase 2</div>
+  
+  <div class="vid-section">
+    <details class="vid-drop">
+      <summary>Watch Capt. Mike Fish This Approach</summary>
+      <select class="vid-select" onchange="changeVideo(this)">
+        <option value="ywe_v34I_nc">Early-Season Topwater Stripers & Open Water Feeds</option>
+<option value="88S-oaw1FaY">Striped Bass Conservation | GotOne App | MA DMF</option>
+      </select>
+      <div class="vid-frame">
+        <iframe src="https://www.youtube.com/embed/ywe_v34I_nc?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </details>
+  </div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE West End Featured Spot</a>
+</div>
+<div class="tnote"><strong>No optimistic signs after all 4 passes?</strong> Striper bite is not on today. Phase 2 has its own window. Sea bass are not going anywhere.</div>
+<div class="phase-break pb2">Phase 2</div>
+
+<!-- ═══ PHASE 2 ═══ -->
+<div class="phase ph2">
+  <div class="phase-eye">Phase 2</div>
+  <div class="phase-name">West End Sea Bass Program</div>
+  <div class="phase-time">10:30 AM–12:30 PM <span class="ho">Hard Out 12:30</span></div>
+</div>
+
+<!-- B1 -->
+<div class="stop">
+  <div class="meta"><span class="badge bt">B1</span><span class="pass">Pass 1 of 5</span><span class="time">10:30–10:50 AM</span></div>
+  <div class="name">Hog Island Wrecks<br>Deep Boulder Relief</div>
+  <div class="coords-row">
+    <span class="coords">41.7167, −70.6283</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Jigging · B.WE.G.J1 (B2500)</span>
+    <span class="tag tag-dist">0 nm · same as A3</span>
+    <span class="tag tag-depth">30–50 ft</span>
+  </div>
+  <div class="stop-details">Same position as A3 troll. Sea bass stacked on wreck relief. Late outgoing — jig stays vertical in current. Slack arrives ~11 AM, GFB protocol activates. Do not leave during the slack window.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Wreck and boulder relief 30–50 ft on the late outgoing. Sea bass stacked tight to structure on the downcurrent edge of the relief. Slack arrives ~11 AM — GFB window opens when current drops below 0.5 kt.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Short uptide drifts across the wreck edges. Bow into current at all times — keeps the jig vertical and in the strike zone. Stay tight to wreck relief, not hovering in open water.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Squinnow 1.75 oz Olive Crab</strong> — primary on late outgoing</li><li><strong>Biki Jig 1.6 oz Pink Squid</strong> — stacked fish on slack</li><li><strong>Biki Jig 3 oz Green Crab</strong> — GFB protocol when current &lt;0.5 kt</li><li><strong>Biki Teaser Rig 18"</strong> — above jig when fish stacked for doubles</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy 7M Inshore Spinning or Conventional</li><li>3000–4000 reel · 20–30 lb braid</li><li>30 lb fluoro primary · 40 lb fluoro teaser doubles · 3–4 ft</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body"><strong>Outgoing:</strong> R2701 vertical short hop. Most hits within a few feet of bottom — do not lift too far. <strong>Slack (GFB):</strong> dead drop, 3–5 sec pause at bottom, lift 12–18". Do NOT burn the retrieve. Line past 45° scope = crank up and reset.</div>
+  </div>
+  <div class="move-trigger">→  20 min no contact → next stop</div>
+  
+  <div class="vid-section">
+    <details class="vid-drop">
+      <summary>Watch Capt. Mike Fish This Approach</summary>
+      <select class="vid-select" onchange="changeVideo(this)">
+        <option value="5gf7YLk1AJw">Seabass Fishing Cape Cod | Hogy Jig-Biki Teaser Rig</option>
+      </select>
+      <div class="vid-frame">
+        <iframe src="https://www.youtube.com/embed/5gf7YLk1AJw?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </details>
+  </div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/approaches/bb-we-g-j1" target="_blank">More Info → BB.WE.G.J1 May Sea Bass on Hog Island Wrecks</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- B2 -->
+<div class="stop">
+  <div class="meta"><span class="badge bt">B2</span><span class="pass">Pass 2 of 5</span><span class="time">10:55–11:15 AM</span></div>
+  <div class="name">Hog Island Channel Edge<br>North Face</div>
+  <div class="coords-row">
+    <span class="coords">41.7200, −70.6270 Est.</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Jigging · Same approach</span>
+    <span class="tag tag-dist">0.2 nm N · 1 min</span>
+    <span class="tag tag-depth">25–40 ft</span>
+  </div>
+  <div class="stop-details">Fish slid off the wrecks onto the channel edge in lighter current. Different angle on the same structure — often the reset move that finds the fish.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Channel edge north face 25–40 ft. Fish slid off the wreck structure onto the channel edge in lighter current. Different angle on the same ecosystem — often the reset move that finds the school.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Step uptide on the contour break. Short drifts along the edge. Same approach as B1 from a new angle.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Squinnow 1.75 oz Olive Crab</strong></li><li><strong>Biki Jig 1.6 oz</strong> — at and around slack</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as B1</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Same short hop technique as B1. Different position on structure.</div>
+  </div>
+  <div class="move-trigger">→  Still quiet → next stop</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE Groundfish Program</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- B3 -->
+<div class="stop">
+  <div class="meta"><span class="badge bt">B3</span><span class="pass">Pass 3 of 5</span><span class="time">11:20–11:40 AM</span></div>
+  <div class="name">Mashnee Shoal Edge<br>Shallow Structure</div>
+  <div class="coords-row">
+    <span class="coords">41.7185, −70.6406 <span class="ver">✓</span></span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Jigging · 1 oz</span>
+    <span class="tag tag-dist">0.4 nm SW · 3 min</span>
+    <span class="tag tag-depth">15–25 ft</span>
+  </div>
+  <div class="stop-details">Fish move shallow on the tide turn when deeper structure goes quiet. Scup are reliable on the shoal edge and where scup are stacked, sea bass are usually mixed in.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Shallow shoal edge 15–25 ft on the tide turn. When deeper structure goes quiet, fish slide shallow. Scup are reliable on the shoal edge and where scup stack, sea bass are in the mix.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Work the shoal edge, not the flat. Drop to 1 oz jig head to match the shallower, lighter-current environment.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Squinnow 1.75 oz Olive Crab</strong> — or drop to 1 oz version</li><li><strong>Biki Jig 1.6 oz</strong> — for stacked fish near relief</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as B1</li><li>1 oz jig head for lighter current</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Same short hop technique at reduced weight. Slower, lighter presentation in the shallower zone.</div>
+  </div>
+  <div class="move-trigger">→  Still quiet → next stop</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE Groundfish Program</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- B4 -->
+<div class="stop">
+  <div class="meta"><span class="badge bt">B4</span><span class="pass">Pass 4 of 5</span><span class="time">11:55 AM–12:20 PM</span></div>
+  <div class="name">Cleveland Ledge<br>Ledge Face & Drop-off</div>
+  <div class="coords-row">
+    <span class="coords">41.6278, −70.6914</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Jigging · B.WE.G.J1 (B2500)</span>
+    <span class="tag tag-dist">4 nm SW · 12 min</span>
+    <span class="tag tag-depth">20–50 ft</span>
+  </div>
+  <div class="stop-details">Classic Buzzards Bay sea bass ledge. Hard rock NE face, drop-off on the SE side. Worth the 12-minute run if Hog Island is completely quiet. Step up jig weight to stay vertical in strong current.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Hard rock ledge, NE face and SE drop-off, 20–50 ft. Classic Buzzards Bay sea bass structure. Strong current on the outgoing demands heavier jig to stay vertical. Worth the 12-minute run if Hog Island is completely quiet.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">NE face on the late outgoing. SE drop-off at slack and on the incoming. Work the ledge edge on the outgoing, boulder faces on slack.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>Squinnow 3.5–4.5 oz</strong> — heavier build for stronger current</li><li><strong>Biki Jig 3 oz Green Crab</strong> — GFB at slack</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as B1</li><li>Step up jig weight to maintain vertical presentation</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Stay vertical — step up weight as current demands. Same GFB protocol at slack. Hard rock structure holds fish tight to the bottom edge.</div>
+  </div>
+  <div class="move-trigger">→  Quiet → B5 rock piles on return run</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/cleveland-ledge" target="_blank">More Info → Cleveland Ledge Featured Spot</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- B5 -->
+<div class="stop">
+  <div class="meta"><span class="badge bt">B5</span><span class="pass">Pass 5 of 5</span><span class="time">On return line</span></div>
+  <div class="name">BB Rock Piles<br>Return Pass</div>
+  <div class="coords-row">
+    <span class="coords">41.6800, −70.6600 Est.</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Jigging · B2501</span>
+    <span class="tag tag-dist">2 nm NE of Cleveland</span>
+    <span class="tag tag-depth">15–35 ft</span>
+  </div>
+  <div class="stop-details">Scattered boulder piles on the return line from Cleveland. Opportunistic only — scan sonar on the run. No need to slow down if the bottom is clean.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Scattered boulder piles on the return line from Cleveland back toward Hog Island. Opportunistic only — no reason to slow down if the sonar shows clean bottom.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Scan sonar on the run. If marks show over relief, drop in for a pass. Clean bottom = keep running.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li>Whatever's rigged from Phase 2</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as B series</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Same Phase 2 technique — short uptide drifts, stay vertical.</div>
+  </div>
+  <div class="move-trigger">→  Clean bottom → Phase 3</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE Groundfish Program</a>
+</div>
+
+<div class="tnote"><strong>Hard out 12:30 PM.</strong> Sea bass firing at slack → extend max 30 min, compress Phase 3 to 45 min.</div>
+<div class="phase-break pb3">Phase 3</div>
+
+<!-- ═══ PHASE 3 ═══ -->
+<div class="phase ph3">
+  <div class="phase-eye">Phase 3</div>
+  <div class="phase-name">West End Tog Program</div>
+  <div class="phase-time">12:45–2:30 PM <span class="ho">Hard Out 2:30 · Non-Neg.</span></div>
+</div>
+
+<!-- C1 -->
+<div class="stop">
+  <div class="meta"><span class="badge bb">C1</span><span class="pass">Pass 1 of 3</span><span class="time">12:45–1:05 PM</span></div>
+  <div class="name">Mashnee Island Point<br>Boulder & Reef Face</div>
+  <div class="coords-row">
+    <span class="coords">41.7185, −70.6406 <span class="ver">✓</span></span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Bottom Jigging · B.WE.G.J (B2501)</span>
+    <span class="tag tag-dist">0.4 nm from B3 · 3 min</span>
+    <span class="tag tag-depth">15–30 ft</span>
+  </div>
+  <div class="stop-details">Incoming tide washes green crab off the boulder faces. Tog move onto structure as IT builds. The productive zone on the face is tight — reset the drift often and stay on the contour.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Boulder and reef face 15–30 ft on the early incoming. Green crab washing off the rocks as IT builds. Tog move onto the face when current starts loading the structure. Productive zone is tight — reset the drift often.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Bow uptide. Short drifts ACROSS the boulder face, not parallel to it. Drop jig to bottom. Short lift 6–8 inches. Reset often — the zone is narrow.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>2–3 oz Jig Head + Green Crab</strong> — primary presentation</li><li><strong>Bucktail 2 oz</strong> — when current pushing hard along the face</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Hogy MH Conventional or Heavy Spinning</li><li>4000–5000 reel · 30 lb braid minimum</li><li>30 lb fluoro · no trailer · 3–4 ft</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body"><strong>Feel the weight go heavy — that is the bite, not a strike.</strong> The moment you feel heaviness, sweep the rod hard and fast. One shot. No hesitation. Steer the fish away from structure immediately — they go straight to the rocks.</div>
+  </div>
+  <div class="move-trigger">→  20 min no contact → next stop</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/approaches/bb-we-g-j" target="_blank">More Info → BB.WE.G.J Tog on Boulder Structure</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- C2 -->
+<div class="stop">
+  <div class="meta"><span class="badge bb">C2</span><span class="pass">Pass 2 of 3</span><span class="time">1:10–1:30 PM</span></div>
+  <div class="name">Hog Island Channel Edge<br>Boulder Face</div>
+  <div class="coords-row">
+    <span class="coords">41.7200, −70.6270 Est.</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Bottom Jigging · Same approach</span>
+    <span class="tag tag-dist">0.3 nm N · 2 min</span>
+    <span class="tag tag-depth">20–35 ft</span>
+  </div>
+  <div class="stop-details">Tog may have slid to the deeper boulder face on the channel edge in stronger current. Slightly heavier jig. Same patience.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Deeper boulder face on the channel edge 20–35 ft. Slightly stronger current. Tog may have slid here from the Mashnee face into heavier structure.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Same approach as C1 with slightly heavier jig to account for increased current on the channel edge.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>2–3 oz Jig Head + Green Crab</strong> — heavier build</li><li><strong>Bucktail 2 oz</strong></li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as C1</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Same feel-the-weight technique. Slightly heavier jig, same patience.</div>
+  </div>
+  <div class="move-trigger">→  Still quiet → next stop</div>
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE Tog Program</a>
+</div>
+<div class="nxt">· · ·</div>
+
+<!-- C3 -->
+<div class="stop">
+  <div class="meta"><span class="badge bb">C3</span><span class="pass">Pass 3 of 3</span><span class="time">1:40–2:30 PM</span></div>
+  <div class="name">Pocasset & Monument Beach Coves<br>Sheltered Structure</div>
+  <div class="coords-row">
+    <span class="coords">41.7280, −70.6520 Est.</span>
+    
+  </div>
+  <div class="tags">
+    <span class="tag tag-method">Bottom Jigging · Lighter</span>
+    <span class="tag tag-dist">0.8 nm NW · 5 min</span>
+    <span class="tag tag-depth">10–20 ft</span>
+  </div>
+  <div class="stop-details">Protected cove structure if SW wind has built. Less current, more patient presentation. Drop to 1.5 oz jig head. Tog are still present in shallower protected water on the incoming.</div>
+  <div class="stop-section">
+    <span class="sec-label">Structure</span>
+    <div class="sec-body italic">Sheltered cove structure 10–20 ft. Protected from SW wind. Less current, shallower water. Tog present in protected rocky areas on the incoming — lighter, more patient presentation.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Approach</span>
+    <div class="sec-body">Drop to 1.5 oz jig head. Protected water means less current — slower, more deliberate presentation. Same drift-across-the-face approach.</div>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Capt. Mike's Lures</span>
+    <ul class="lure-list"><li><strong>1.5 oz Jig Head + Green Crab</strong></li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Outfit</span>
+    <ul class="outfit-list"><li>Same outfit as C1</li><li>Drop to 1.5 oz jig head</li></ul>
+  </div>
+  <hr class="sec-divider">
+  <div class="stop-section">
+    <span class="sec-label">Technique / Retrieve</span>
+    <div class="sec-body">Slower presentation in lighter current. Same feel-the-weight hookset — heavy, not a tap. Hard out 2:30 PM.</div>
+  </div>
+  
+  <a class="more-link" href="https://saltycape.com/fishing-system/spots/bb-we" target="_blank">More Info → BB.WE Tog Program</a>
+</div>
+
+<!-- RETURN -->
+<div class="ret">
+  <h2>Return · Mashnee to Onset Ramp</h2>
+  <p>2:30 PM · 2.4 nm · ~15 min · SW 15–20 mph, loaded boat</p>
+</div>
+
+
+
+
+
+
+<script>
+function changeVideo(selectEl) {
+  const vid_id = selectEl.value;
+  const wrapper = selectEl.closest('details');
+  const frame = wrapper.querySelector('.vid-frame');
+  if (!vid_id) { frame.style.display = 'none'; return; }
+  frame.style.display = 'block';
+  frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid_id}?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>`;
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const GPX_URL = "https://captmike2026.github.io/triptix-test/West_End_Canal_SaltyCape.gpx";
+  document.querySelectorAll('.badge').forEach(badge => {
+    const id = badge.textContent.trim();
+    if (!['A1','A2','A3','A4','B1','B2','B3','B4','B5','C1','C2','C3'].includes(id)) return;
+    const row = badge.closest('.stop').querySelector('.coords-row');
+    if (!row) return;
+    const a = document.createElement('a');
+    a.href = GPX_URL;
+    a.textContent = '↓ Add to Navionics';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.style.cssText = 'display:inline-flex;align-items:center;gap:4px;color:#fff;' +
+      'font-family:Inconsolata,monospace;font-size:11px;font-weight:700;' +
+      'padding:5px 12px;border-radius:2px;text-decoration:none;letter-spacing:.5px;';
+    a.style.background = id.startsWith('A') ? '#1F3864' :
+                         id.startsWith('B') ? '#1F7A8C' : '#5C3317';
+    row.appendChild(a);
+  });
+});
+</script>
+</body>
+</html>
